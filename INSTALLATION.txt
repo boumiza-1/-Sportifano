@@ -1,0 +1,15 @@
+SPORTIFANO — CORRECTION ADMIN
+
+1) Ouvrir le ZIP puis extraire tous les fichiers.
+2) GitHub boumiza-1/-Sportifano : sauvegarder la version actuelle (Code > Download ZIP).
+3) Remplacer EN PARTICULIER les fichiers admin.html et admin.js avec les fichiers de ce ZIP (noms EXACTS).
+4) Le fichier admin-login-corrige.html n'est PAS utilisé par /admin.html. Supprimez-le si vous voulez après sauvegarde.
+5) Commit changes sur main et attendre GitHub Pages.
+6) Vérifier HTTPS sans avertissement AVANT de saisir un nouveau mot de passe.
+7) Firebase Authentication > Paramètres > Domaines autorisés : sportifano.com.
+8) Firebase Realtime Database > admins > UID == booléen true.
+9) Ne PAS conserver les règles publiques temporaires. Publier et tester database.rules.json après avoir sauvegardé les règles actuelles.
+10) Mot de passe déjà apparu dans l'URL : le changer dans Firebase.
+
+Si login échoue, un message d'erreur doit maintenant être visible sous le bouton.
+NOTE : pas de test de bout en bout sur votre Firebase réel depuis ici.

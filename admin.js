@@ -4,8 +4,21 @@ import {ref,get,onValue,push,set,update,remove} from 'https://www.gstatic.com/fi
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let products={},cats={},orders={},posts={},settings={},section='dashboard';const statusOptions=['nouvelle','confirmée','préparation','expédiée','livrée','annulée'];
 const stat=()=>Object.keys(orders).length;
-$('#adminLogin').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await signInWithEmailAndPassword(auth,f.get('email'),f.get('password'))}catch(err){$('#loginError').textContent=err.message}};
-onAuthStateChanged(auth,async user=>{if(!user||user.isAnonymous){if($('#layout'))location.reload();return}try{const s=await get(ref(db,'admins/'+user.uid));if(s.val()!==true)throw new Error('Ce compte n’a pas le rôle administrateur. Consultez le README pour ajouter son UID dans la console Firebase.');start()}catch(err){await signOut(auth);$('#loginError').textContent=err.message}});
+window.sportifanoLoginReady = true;
+$('#adminLogin').onsubmit=async e=>{
+ e.preventDefault();
+ const form=e.currentTarget;
+ const btn=form.querySelector('button');
+ const error=$('#loginError');
+ error.textContent='';btn.disabled=true;btn.textContent='CONNEXION EN COURS…';
+ const f=new FormData(form);
+ try {
+  await signInWithEmailAndPassword(auth,String(f.get('email')).trim(),String(f.get('password')));
+ } catch(err) {
+  error.textContent = 'Connexion impossible : '+(err.code||err.message);
+ } finally { btn.disabled=false;btn.textContent='SE CONNECTER ↗'; }
+};
+onAuthStateChanged(auth,async user=>{if(!user||user.isAnonymous){if($('#layout'))location.reload();return}try{const s=await get(ref(db,'admins/'+user.uid));if(s.val()!==true)throw new Error('Ce compte n’a pas le rôle administrateur. Consultez le README pour ajouter son UID dans la console Firebase.');start()}catch(err){$('#loginError').textContent='Accès administrateur refusé : '+err.message;await signOut(auth)}});
 function start(){$('#adminApp').innerHTML='<div class="admin-layout" id="layout"><aside class="sidebar"><a class="brand" href="./index.html">sporti<span>fano.</span></a>'+[['dashboard','Vue générale'],['products','Produits'],['categories','Catégories'],['orders','Commandes'],['posts','Blog'],['settings','Couverture & annonces']].map(([k,v])=>'<button class="sidebtn" data-section="'+k+'">'+v+'</button>').join('')+'<button class="sidebtn" id="logout">Déconnexion</button></aside><main class="admin-content" id="workspace"></main></div><div id="dialog"></div>';document.querySelectorAll('[data-section]').forEach(b=>b.onclick=()=>{section=b.dataset.section;render()});$('#logout').onclick=()=>signOut(auth);onValue(ref(db,'products'),s=>{products=s.val()||{};render()});onValue(ref(db,'categories'),s=>{cats=s.val()||{};render()});onValue(ref(db,'orders'),s=>{orders=s.val()||{};render()});onValue(ref(db,'posts'),s=>{posts=s.val()||{};render()});onValue(ref(db,'settings'),s=>{settings=s.val()||{};render()});render()}
 function dialog(html){$('#dialog').innerHTML='<div class="modal-bg" id="bg"><div class="modal">'+html+'</div></div>';$('#bg').onclick=e=>{if(e.target.id==='bg')close()}}
 function close(){$('#dialog').innerHTML=''}
