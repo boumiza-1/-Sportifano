@@ -1,0 +1,62 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('admins').child(auth.uid).val() === true)",
+        ".write": false
+      }
+    },
+    "products": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "categories": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "settings": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "posts": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+    },
+    "orders": {
+      ".indexOn": ["uid"],
+      ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || (query.orderByChild === 'uid' && query.equalTo === auth.uid))",
+      "$orderId": {
+        ".read": "auth != null && (root.child('admins').child(auth.uid).val() === true || data.child('uid').val() === auth.uid)",
+        ".write": "auth != null && (root.child('admins').child(auth.uid).val() === true || (!data.exists() && newData.child('uid').val() === auth.uid && newData.child('status').val() === 'nouvelle' && newData.child('paymentMethod').val() === 'cash_on_delivery' && newData.child('createdAt').isNumber() && newData.child('items').exists() && newData.child('customer').exists()))",
+        ".validate": "newData.hasChildren(['uid','customer','items','status','createdAt','paymentMethod'])",
+        "uid": {".validate": "newData.isString()"},
+        "status": {".validate": "newData.isString()"},
+        "createdAt": {".validate": "newData.isNumber()"},
+        "paymentMethod": {".validate": "newData.isString()"},
+        "customer": {
+          ".validate": "newData.hasChildren(['name','phone','region','address'])",
+          "name": {".validate": "newData.isString() && newData.val().length > 1 && newData.val().length <= 100"},
+          "phone": {".validate": "newData.isString() && newData.val().length >= 8 && newData.val().length <= 18"},
+          "region": {".validate": "newData.isString() && newData.val().length > 1 && newData.val().length <= 80"},
+          "address": {".validate": "newData.isString() && newData.val().length > 1 && newData.val().length <= 500"},
+          "note": {".validate": "newData.isString() && newData.val().length <= 500"},
+          "$other": {".validate": false}
+        },
+        "items": {
+          ".validate": "newData.hasChildren(['0'])",
+          "$item": {
+            ".validate": "newData.hasChildren(['productId','qty'])",
+            "productId": {".validate": "newData.isString() && newData.val().length < 150"},
+            "qty": {".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"},
+            "color": {".validate": "newData.isString() && newData.val().length <= 60"},
+            "size": {".validate": "newData.isString() && newData.val().length <= 60"},
+            "$other": {".validate": false}
+          }
+        },
+        "$other": {".validate": false}
+      }
+    }
+  }
+}
