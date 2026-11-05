@@ -57,3 +57,15 @@ Conservez `boumiza-1/-Sportifano` et son domaine. **Ne supprimez ni le repositor
 GitHub Pages : `boumiza-1/-Sportifano` → Settings → Pages : branche `main`, racine. Custom domain : `sportifano.com`. Les DNS Hostinger restent dirigés vers les IP GitHub Pages ; ne changez pas les DNS et ne réactivez pas Render. `https://www.sportifano.com` peut rediriger vers le domaine principal selon la configuration GitHub.
 
 **Conseil de migration :** gardez le ZIP de sauvegarde et testez avec un produit factice avant d'envoyer des commandes réelles.
+
+## 7. Assistant shopping
+
+Le bouton **Besoin d’aide ?** ouvre un assistant qui recherche dans le même catalogue Firebase que la boutique. Il affiche les noms, prix en DT, tailles, couleurs, descriptions et informations de livraison renseignés par l’Admin. Le bouton **Voir le produit** ouvre la fiche habituelle pour choisir les options et ajouter au panier. L’assistant explique aussi comment commander avec ou sans compte et ouvre le panier existant.
+
+Exemples : « fama crapon ? », « نحب كرامبون », « maillot noir », « running moins de 150 DT », puis « chnowa soumou ? », « autres produits » ou « moins cher ». Les boutons **Autres produits** et **Moins cher** permettent de comparer les résultats. Les synonymes courants, les recherches par marque et les petites fautes sont pris en charge ; cette recherche locale ne comprend pas toutes les formulations comme un modèle d’IA généraliste. Elle ne nécessite aucune clé API ni abonnement.
+
+Les produits masqués sont exclus. Un stock positif est présenté comme indicatif, un stock nul comme indisponible et un stock manquant comme à confirmer. Les alternatives sont identifiées comme telles ; aucun produit, prix, délai ou frais de livraison n’est inventé. Les cartes de la conversation reflètent les modifications du catalogue. Les messages restent uniquement en mémoire dans l’onglet et disparaissent au rechargement. Si Firebase ne charge pas, l’aide aux commandes reste accessible et l’assistant signale que les prix et disponibilités ne peuvent pas être confirmés.
+
+Pour publier l’assistant sur le site statique, conserver ensemble `index.html`, `shop.js`, `chatbot.js`, `chatbot-engine.mjs` et `chatbot.css`, en plus des autres fichiers de la boutique. Aucune compilation ni modification des règles Firebase n’est nécessaire.
+
+Depuis la racine du dépôt, les tests du moteur se lancent avec `node tests/chatbot-engine.test.mjs`. Les tests navigateur se lancent avec `node tests/chatbot-browser.cjs` lorsque Playwright et Chromium sont installés ; `CHROMIUM_PATH` permet de choisir le binaire Chromium. Ils utilisent uniquement des produits et modules Firebase simulés, sans lecture ni écriture dans la base réelle. Ils vérifient les recommandations, le panier, le passage au formulaire de commande, les mises à jour, la sécurité de l’affichage et l’utilisation mobile. Le catalogue et la configuration Firebase de production doivent être vérifiés séparément lors de la mise en ligne.
